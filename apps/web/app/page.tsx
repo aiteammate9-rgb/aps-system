@@ -215,7 +215,7 @@ function Result({ data, viewDate }: { data: ApiResponse; viewDate: string }) {
             const on = k === view;
             return (
               <button key={k} onClick={() => setView(k)} style={{
-                padding: "6px 14px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer",
+                padding: "6px 14px", borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: "pointer",
                 border: on ? "1px solid #2f6fe0" : "1px solid #d5dcea",
                 background: on ? "#e7efff" : "#ffffff", color: on ? "#2f6fe0" : "#6b7794",
               }}>{lbl}</button>
@@ -223,7 +223,7 @@ function Result({ data, viewDate }: { data: ApiResponse; viewDate: string }) {
           })}
         </div>
         {view !== "line" && (
-          <div style={{ fontWeight: 700, color: "#2f6fb0", fontSize: 14, fontFamily: TF, padding: "8px 6px", background: "#eef2f9", borderRadius: "10px 10px 0 0", border: "1px solid #e2e7f0", borderBottom: "none" }}>
+          <div style={{ fontWeight: 700, color: "#2f6fb0", fontSize: 16, fontFamily: TF, padding: "8px 6px", background: "#eef2f9", borderRadius: "10px 10px 0 0", border: "1px solid #e2e7f0", borderBottom: "none" }}>
             {view === "full" ? "📊 กราฟพยากรณ์ชีวิต ๑๒ ตัว" : view === "v" ? "📜 ไทม์ไลน์ชีวิต — เลขดวงรายปี" : "🗺️ ไทม์ไลน์ชีวิต — เลขดวงรายปี (สูง=ดี · ต่ำ=ระวัง)"}
           </div>
         )}
@@ -237,12 +237,12 @@ function Result({ data, viewDate }: { data: ApiResponse; viewDate: string }) {
                 : <LifeGraph natal={data.natal} base12={data.result.base12} centerAge={centerAge} curAge={curAge} birthYear={birthYear} birthLunarMonth={lunarMonth} />}
         </div>
         <YearTable data={data} centerAge={centerAge} setCenterAge={setCenterAge} curAge={curAge} light />
-        <p style={{ fontSize: 11, color: "#7b88ad", marginTop: 8, lineHeight: 1.5 }}>
+        <p style={{ fontSize: 14, color: "#7b88ad", marginTop: 8, lineHeight: 1.5 }}>
           🔴 จุดสีแดง = ปีกราฟลงต่ำ (ควรระวัง), 🟡 = ปีกราฟขึ้นสูง (ดี) — เปอร์เซ็นต์มาก/กราฟสูงจะดีกว่าปีที่กราฟต่ำ
         </p>
       </div>
       <Predictions data={data} centerAge={centerAge} />
-      <p style={{ fontSize: 12, opacity: 0.5, marginTop: 16 }}>{data.disclaimer}</p>
+      <p style={{ fontSize: 14, opacity: 0.5, marginTop: 16 }}>{data.disclaimer}</p>
     </div>
   );
 }
@@ -258,11 +258,11 @@ function InfoBanner({ data, curAge }: { data: ApiResponse; curAge: number }) {
       display: "flex", alignItems: "center", gap: 16,
     }}>
       <div style={{ fontSize: 38, lineHeight: 1 }}>🌙</div>
-      <div style={{ lineHeight: 1.7, fontSize: 14 }}>
+      <div style={{ lineHeight: 1.7, fontSize: 16 }}>
         <div style={{ color: "#26324d" }}>เกิดวันที่ {d} {THAI_MONTHS_FULL[(m! - 1)]} พ.ศ.{b.be} / ค.ศ.{y} เวลา 12:00น.</div>
         <div style={{ color: "#b07d12" }}>วัน{b.weekdayName} {b.phase} {toThaiNum(b.phaseDay)} ค่ำ เดือน{b.lunarMonthName} ({toThaiNum(b.lunarMonth)}) ปี{b.naksatrName}</div>
-        <div style={{ color: "#5a6b8a", fontSize: 12.5 }}>จ.ศ. {b.cs} · ม.ศ. {b.ms} · ร.ศ. {b.rs} · {b.suratin}สุรทิน {b.mas}มาส {b.wan}วาร</div>
-        <div style={{ color: "#2f6fb0", fontSize: 13 }}>อายุ {curAge} ปี · อายุเต็ม/ราชการ {curAge} ปี · อายุย่าง/โหร {curAge + 1} ปี ({curAge + Number(y) + 544})</div>
+        <div style={{ color: "#5a6b8a", fontSize: 14.5 }}>จ.ศ. {b.cs} · ม.ศ. {b.ms} · ร.ศ. {b.rs} · {b.suratin}สุรทิน {b.mas}มาส {b.wan}วาร</div>
+        <div style={{ color: "#2f6fb0", fontSize: 15 }}>อายุ {curAge} ปี · อายุเต็ม/ราชการ {curAge} ปี · อายุย่าง/โหร {curAge + 1} ปี ({curAge + Number(y) + 544})</div>
       </div>
     </div>
   );
@@ -279,10 +279,10 @@ function TransitBanner({ data }: { data: ApiResponse }) {
       display: "flex", alignItems: "center", gap: 16,
     }}>
       <div style={{ fontSize: 38, lineHeight: 1 }}>🌙</div>
-      <div style={{ lineHeight: 1.7, fontSize: 14 }}>
+      <div style={{ lineHeight: 1.7, fontSize: 16 }}>
         <div style={{ color: "#26324d" }}>วันจร วันที่ {d} {THAI_MONTHS_FULL[(m! - 1)]} พ.ศ.{t.be} / ค.ศ.{y}</div>
         <div style={{ color: "#b07d12" }}>วัน{t.weekdayName} {t.phase} {toThaiNum(t.phaseDay)} ค่ำ เดือน{t.lunarMonthName} ({toThaiNum(t.lunarMonth)}) ปี{t.naksatrName}</div>
-        <div style={{ color: "#5a6b8a", fontSize: 12.5 }}>จ.ศ. {t.cs} · ม.ศ. {t.ms} · ร.ศ. {t.rs} · {t.suratin}สุรทิน {t.mas}มาส {t.wan}วาร</div>
+        <div style={{ color: "#5a6b8a", fontSize: 14.5 }}>จ.ศ. {t.cs} · ม.ศ. {t.ms} · ร.ศ. {t.rs} · {t.suratin}สุรทิน {t.mas}มาส {t.wan}วาร</div>
       </div>
     </div>
   );
@@ -309,7 +309,7 @@ function Predictions({ data, centerAge }: { data: ApiResponse; centerAge: number
         g.pairs.map((p, i) => (
           <div key={g.value + "-" + i} style={cardStyle}>
             <div style={{ fontWeight: 700 }}>{p.a} สัมพันธ์กับ {p.b} <span style={{ color: "#ffd23f" }}>ตกเลข {g.value}</span></div>
-            <div style={{ fontSize: 13, opacity: 0.85, marginTop: 4 }}>{p.text ?? "(ยังไม่มีคำทำนายคู่นี้ในคลัง)"}</div>
+            <div style={{ fontSize: 15, opacity: 0.85, marginTop: 4 }}>{p.text ?? "(ยังไม่มีคำทำนายคู่นี้ในคลัง)"}</div>
           </div>
         ))
       )}
@@ -322,29 +322,29 @@ function Predictions({ data, centerAge }: { data: ApiResponse; centerAge: number
         <div style={{ ...cardStyle, flex: 1, minWidth: 240, border: "1px solid #2e6b3e" }}>
           <div style={{ fontWeight: 700, color: "#37d67a" }}>📈 ช่วงกราฟขึ้นสูง (ดี)</div>
           <div style={{ marginTop: 4 }}>พ.ศ. {hi.year} · อายุ {hi.age} ปี · เลข {hi.v} ({Math.floor((hi.v / 12) * 100)}%)</div>
-          <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>จังหวะชีวิตดี เหมาะริเริ่ม ลงทุน ตัดสินใจเรื่องสำคัญ</div>
+          <div style={{ fontSize: 14, opacity: 0.8, marginTop: 4 }}>จังหวะชีวิตดี เหมาะริเริ่ม ลงทุน ตัดสินใจเรื่องสำคัญ</div>
         </div>
         <div style={{ ...cardStyle, flex: 1, minWidth: 240, border: "1px solid #6b2e2e" }}>
           <div style={{ fontWeight: 700, color: "#ff6b6b" }}>📉 ช่วงกราฟลงต่ำ (ระวัง)</div>
           <div style={{ marginTop: 4 }}>พ.ศ. {lo.year} · อายุ {lo.age} ปี · เลข {lo.v} ({Math.floor((lo.v / 12) * 100)}%)</div>
-          <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>ควรระมัดระวัง ตั้งรับ หลีกเลี่ยงความเสี่ยงใหญ่</div>
+          <div style={{ fontSize: 14, opacity: 0.8, marginTop: 4 }}>ควรระมัดระวัง ตั้งรับ หลีกเลี่ยงความเสี่ยงใหญ่</div>
         </div>
       </div>
       {data.yearlyTransits.map((t) => (
         <div key={t.age}>
           <h3 style={{ color: "#2f6fb0", marginTop: 18 }}>
             คำทำนายประจำปี อายุ {t.age - 1}–{t.age} ปี (พ.ศ. {birthYear + t.age - 1 + 543}–{birthYear + t.age + 543})
-            <span style={{ color: "#ffd23f", fontSize: 14 }}> (เลข {t.value})</span>
+            <span style={{ color: "#ffd23f", fontSize: 16 }}> (เลข {t.value})</span>
           </h3>
-          <div style={{ ...cardStyle, whiteSpace: "pre-wrap", lineHeight: 1.7, fontSize: 13 }}>{t.poem || "(ไม่มีกลอน)"}</div>
+          <div style={{ ...cardStyle, whiteSpace: "pre-wrap", lineHeight: 1.7, fontSize: 15 }}>{t.poem || "(ไม่มีกลอน)"}</div>
         </div>
       ))}
 
       <SectionHead>3. ทำนายตามวันเกิดและเดือนเกิด</SectionHead>
       <h3 style={{ color: "#2f6fb0" }}>คำทำนายตามวันเกิด (วัน{data.weekday.name})</h3>
-      <div style={{ ...cardStyle, whiteSpace: "pre-wrap", lineHeight: 1.6, fontSize: 13 }}>{data.weekday.text || "(ไม่มีข้อมูล)"}</div>
+      <div style={{ ...cardStyle, whiteSpace: "pre-wrap", lineHeight: 1.6, fontSize: 15 }}>{data.weekday.text || "(ไม่มีข้อมูล)"}</div>
       <h3 style={{ color: "#2f6fb0", marginTop: 18 }}>คำทำนายตามเดือนเกิด (เดือน{data.birthMonth.name} — จันทรคติ)</h3>
-      <div style={{ ...cardStyle, whiteSpace: "pre-wrap", lineHeight: 1.6, fontSize: 13 }}>{data.birthMonth.text || "(ไม่มีข้อมูล)"}</div>
+      <div style={{ ...cardStyle, whiteSpace: "pre-wrap", lineHeight: 1.6, fontSize: 15 }}>{data.birthMonth.text || "(ไม่มีข้อมูล)"}</div>
 
       <SectionHead>4. ศาสตร์เสริม (ทักษา · ราศี · เลขศาสตร์ · ปีชง · ธาตุ)</SectionHead>
       <Divination d={data.divination} />
@@ -370,14 +370,14 @@ function Divination({ d }: { d: Divination }) {
       {/* ทักษา */}
       <div style={{ ...cardStyle }}>
         <div style={{ fontWeight: 700, color: "#2f6fb0" }}>🪐 ทักษา (ดาวเจ้าเรือนวันเกิด: {taksa.birthPlanet})</div>
-        <div style={{ marginTop: 6, display: "flex", flexWrap: "wrap", gap: 4, fontSize: 11 }}>
+        <div style={{ marginTop: 6, display: "flex", flexWrap: "wrap", gap: 4, fontSize: 14 }}>
           {taksa.houses.map((h) => (
             <span key={h.house} title={h.meaning} style={{ background: h.house === "กาลกิณี" ? "#fdeaea" : h.house === "ศรี" ? "#e7f6ec" : "#eef2f9", border: "1px solid #d5dcea", borderRadius: 4, padding: "2px 6px" }}>
               {h.house}:{h.planet}
             </span>
           ))}
         </div>
-        <div style={{ marginTop: 8, fontSize: 13, lineHeight: 1.7 }}>
+        <div style={{ marginTop: 8, fontSize: 15, lineHeight: 1.7 }}>
           <div>✅ <b style={{ color: "#37d67a" }}>สีเสริมโชค/เสน่ห์ (ศรี):</b> {taksa.luckColor}</div>
           <div>👑 <b style={{ color: "#ffd23f" }}>สีเสริมอำนาจ (เดช):</b> {taksa.powerColor}</div>
           <div>⛔ <b style={{ color: "#ff6b6b" }}>สีต้องห้าม (กาลกิณี={taksa.kalakiniPlanet}):</b> {taksa.avoidColor}</div>
@@ -386,30 +386,30 @@ function Divination({ d }: { d: Divination }) {
       {/* ราศี */}
       <div style={{ ...cardStyle }}>
         <div style={{ fontWeight: 700, color: "#2f6fb0" }}>♈ ราศีเกิด (สุริยคติ): {rasi.name}</div>
-        <div style={{ marginTop: 6, fontSize: 13 }}>ธาตุ <b>{rasi.element}</b> · ดาวเจ้าเรือน <b>{rasi.ruler}</b></div>
-        <div style={{ marginTop: 6, fontSize: 13, lineHeight: 1.6, opacity: 0.9 }}>{rasi.text}</div>
+        <div style={{ marginTop: 6, fontSize: 15 }}>ธาตุ <b>{rasi.element}</b> · ดาวเจ้าเรือน <b>{rasi.ruler}</b></div>
+        <div style={{ marginTop: 6, fontSize: 15, lineHeight: 1.6, opacity: 0.9 }}>{rasi.text}</div>
       </div>
       {/* เลขศาสตร์ */}
       <div style={{ ...cardStyle }}>
         <div style={{ fontWeight: 700, color: "#2f6fb0" }}>🔢 เลขศาสตร์ (ผลรวมวันเดือนปีเกิด)</div>
-        <div style={{ marginTop: 6, fontSize: 13 }}>ผลรวม <b style={{ color: "#ffd23f" }}>{numerology.sum}</b> → รากเลข <b style={{ color: "#ffd23f" }}>{numerology.root}</b></div>
-        <div style={{ marginTop: 6, fontSize: 13, lineHeight: 1.6, opacity: 0.9 }}>{numerology.text}</div>
+        <div style={{ marginTop: 6, fontSize: 15 }}>ผลรวม <b style={{ color: "#ffd23f" }}>{numerology.sum}</b> → รากเลข <b style={{ color: "#ffd23f" }}>{numerology.root}</b></div>
+        <div style={{ marginTop: 6, fontSize: 15, lineHeight: 1.6, opacity: 0.9 }}>{numerology.text}</div>
       </div>
       {/* ปีชง */}
       <div style={{ ...cardStyle, border: `1px solid ${chongColor}66` }}>
         <div style={{ fontWeight: 700, color: chongColor }}>🧧 ปีชง (ปีเกิด {chong.birthNak} · ปีที่ดู {chong.yearNak})</div>
-        <div style={{ marginTop: 6, fontSize: 14 }}>สถานะ: <b style={{ color: chongColor }}>{chong.status}</b></div>
-        <div style={{ marginTop: 6, fontSize: 13, lineHeight: 1.6, opacity: 0.9 }}>{chong.text}</div>
+        <div style={{ marginTop: 6, fontSize: 16 }}>สถานะ: <b style={{ color: chongColor }}>{chong.status}</b></div>
+        <div style={{ marginTop: 6, fontSize: 15, lineHeight: 1.6, opacity: 0.9 }}>{chong.text}</div>
       </div>
       {/* ธาตุประจำตัว (วัน×ปี / เดือน×ปี) */}
       <div style={{ ...cardStyle, gridColumn: "1 / -1" }}>
         <div style={{ fontWeight: 700, color: "#2f6fb0" }}>🌿 ธาตุประจำตัว (ราศี × ปีนักษัตร × ดาวเจ้าวัน)</div>
-        <div style={{ marginTop: 6, fontSize: 13 }}>
+        <div style={{ marginTop: 6, fontSize: 15 }}>
           ธาตุราศี <b style={{ color: "#ffd23f" }}>{d.elementProfile.rasiElement}</b> ·
           ธาตุปีนักษัตร <b style={{ color: "#ffd23f" }}>{d.elementProfile.yearElement}</b> ·
           ดาวเจ้าวัน <b style={{ color: "#ffd23f" }}>{d.elementProfile.dayPlanet}</b>
         </div>
-        <div style={{ marginTop: 6, fontSize: 13, lineHeight: 1.6, opacity: 0.9 }}>{d.elementProfile.text}</div>
+        <div style={{ marginTop: 6, fontSize: 15, lineHeight: 1.6, opacity: 0.9 }}>{d.elementProfile.text}</div>
       </div>
     </div>
   );
@@ -440,7 +440,7 @@ function Compatibility({ personADate }: { personADate: string }) {
   const sel: React.CSSProperties = { background: "#ffffff", color: "#26324d", border: "1px solid #cbd5e8", borderRadius: 6, padding: "6px 8px" };
   return (
     <div style={{ ...cardStyle }}>
-      <div style={{ fontSize: 13, color: "#9fb0d8", marginBottom: 8 }}>วันเกิดคนที่ 1 = ดวงด้านบน · กรอกวันเกิดคนที่ 2 เพื่อเทียบ</div>
+      <div style={{ fontSize: 15, color: "#9fb0d8", marginBottom: 8 }}>วันเกิดคนที่ 1 = ดวงด้านบน · กรอกวันเกิดคนที่ 2 เพื่อเทียบ</div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
         <select value={bDay} onChange={(e) => setBDay(+e.target.value)} style={sel}>{Array.from({ length: 31 }, (_, i) => <option key={i} value={i + 1}>{i + 1}</option>)}</select>
         <select value={bMonth} onChange={(e) => setBMonth(+e.target.value)} style={sel}>{THAI_MONTHS_FULL.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}</select>
@@ -452,7 +452,7 @@ function Compatibility({ personADate }: { personADate: string }) {
         <div style={{ marginTop: 12 }}>
           <div style={{ fontSize: 32, fontWeight: 800, color: "#ffd23f" }}>{res.compatibility.emoji} เข้ากัน {res.compatibility.percent}%</div>
           <div style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>{res.compatibility.level}</div>
-          <div style={{ marginTop: 6, fontSize: 13, lineHeight: 1.8 }}>
+          <div style={{ marginTop: 6, fontSize: 15, lineHeight: 1.8 }}>
             <div>นักษัตร {res.a.naksatrName} ↔ {res.b.naksatrName} : <b style={{ color: "#ffd23f" }}>{res.compatibility.naksatrRel}</b></div>
             <div>ธาตุราศี {res.a.rasiElement} ↔ {res.b.rasiElement} : <b style={{ color: "#ffd23f" }}>{res.compatibility.elementRel}</b></div>
             <div>วันเกิด : {res.compatibility.weekdayRel}</div>
@@ -523,32 +523,32 @@ function CelebMatch({ personADate }: { personADate: string }) {
     <div style={{ ...cardStyle }}>
       {/* ปุ่มเล็กเปิด/ปิดตัวเลือก — ซ่อนทั้งหมดโดยดีฟอลต์ (เหลือแค่ผลจับคู่) */}
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button onClick={() => setShowList((s) => !s)} style={{ background: "#ffffff", color: "#6b7794", border: "1px solid #d5dcea", borderRadius: 14, padding: "3px 12px", cursor: "pointer", fontSize: 12 }}>{showList ? "▲ ปิดตัวเลือก" : "⚙️ ตัวเลือกจับคู่ดารา"}</button>
+        <button onClick={() => setShowList((s) => !s)} style={{ background: "#ffffff", color: "#6b7794", border: "1px solid #d5dcea", borderRadius: 14, padding: "3px 12px", cursor: "pointer", fontSize: 14 }}>{showList ? "▲ ปิดตัวเลือก" : "⚙️ ตัวเลือกจับคู่ดารา"}</button>
       </div>
       {showList && (
         <>
-          <div style={{ fontSize: 12, color: "#2f6fb0", margin: "8px 0" }}>🗓️ จับคู่ <b>ดาราประจำเดือนนี้</b> ให้อัตโนมัติ — กด 🎲 สุ่มใหม่ หรือเลือกเองได้</div>
+          <div style={{ fontSize: 14, color: "#2f6fb0", margin: "8px 0" }}>🗓️ จับคู่ <b>ดาราประจำเดือนนี้</b> ให้อัตโนมัติ — กด 🎲 สุ่มใหม่ หรือเลือกเองได้</div>
           {/* ปุ่มลัด */}
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
             <span style={{ flex: 1 }} />
-            <button onClick={randomMatch} disabled={loading} style={{ background: "#7c3aed", color: "#fff", border: "none", borderRadius: 14, padding: "4px 13px", cursor: "pointer", fontSize: 12 }}>🎲 สุ่ม</button>
-            <button onClick={() => setAdding((s) => !s)} style={{ background: "#eef2f9", color: "#2f6fb0", border: "1px solid #d5dcea", borderRadius: 14, padding: "4px 11px", cursor: "pointer", fontSize: 12 }}>➕ เพิ่มเอง</button>
+            <button onClick={randomMatch} disabled={loading} style={{ background: "#7c3aed", color: "#fff", border: "none", borderRadius: 14, padding: "4px 13px", cursor: "pointer", fontSize: 14 }}>🎲 สุ่ม</button>
+            <button onClick={() => setAdding((s) => !s)} style={{ background: "#eef2f9", color: "#2f6fb0", border: "1px solid #d5dcea", borderRadius: 14, padding: "4px 11px", cursor: "pointer", fontSize: 14 }}>➕ เพิ่มเอง</button>
           </div>
           {/* ตัวกรองหมวด */}
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
             {cats.map((cat) => (
               <button key={cat} onClick={() => setFilter(cat)}
-                style={{ background: filter === cat ? "#2563eb" : "#ffffff", color: filter === cat ? "#fff" : "#5a6b8a", border: "1px solid #d5dcea", borderRadius: 14, padding: "4px 11px", cursor: "pointer", fontSize: 12, fontWeight: filter === cat ? 700 : 400 }}>{cat}</button>
+                style={{ background: filter === cat ? "#2563eb" : "#ffffff", color: filter === cat ? "#fff" : "#5a6b8a", border: "1px solid #d5dcea", borderRadius: 14, padding: "4px 11px", cursor: "pointer", fontSize: 14, fontWeight: filter === cat ? 700 : 400 }}>{cat}</button>
             ))}
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", maxHeight: 180, overflowY: "auto" }}>
             {shown.map((c) => (
               <span key={c.name} style={{ display: "inline-flex", alignItems: "center", background: celeb?.name === c.name ? "#2563eb" : "#eef2f9", border: "1px solid #d5dcea", borderRadius: 16, overflow: "hidden" }}>
                 <button onClick={() => match(c)} disabled={loading}
-                  style={{ background: "transparent", color: celeb?.name === c.name ? "#ffffff" : "#26324d", border: "none", padding: "5px 10px", cursor: "pointer", fontSize: 12 }}>
+                  style={{ background: "transparent", color: celeb?.name === c.name ? "#ffffff" : "#26324d", border: "none", padding: "5px 10px", cursor: "pointer", fontSize: 14 }}>
                   {c.emoji} {c.name}
                 </button>
-                {c.cat === "เพิ่มเอง" && <span onClick={() => removeCeleb(c.name)} title="ลบ" style={{ cursor: "pointer", color: "#ff8a8a", padding: "0 8px 0 2px", fontSize: 13 }}>✕</span>}
+                {c.cat === "เพิ่มเอง" && <span onClick={() => removeCeleb(c.name)} title="ลบ" style={{ cursor: "pointer", color: "#ff8a8a", padding: "0 8px 0 2px", fontSize: 15 }}>✕</span>}
               </span>
             ))}
           </div>
@@ -605,7 +605,7 @@ function CelebMatch({ personADate }: { personADate: string }) {
             {showSpark && <span className="aps-sparkR" style={{ marginLeft: 4 }}>✨</span>}
           </div>
           <div style={{ fontSize: 21, fontWeight: 800, color: levelCol, animation: "apsFloat 3s ease-in-out infinite" }}>{res.compatibility.level}</div>
-          <div style={{ fontSize: 12.5, opacity: 0.85, marginTop: 8 }}>
+          <div style={{ fontSize: 14.5, opacity: 0.85, marginTop: 8 }}>
             นักษัตร {res.a.naksatrName}↔{res.b.naksatrName}: {res.compatibility.naksatrRel} · ธาตุ {res.a.rasiElement}↔{res.b.rasiElement}: {res.compatibility.elementRel}
           </div>
         </div>
@@ -694,7 +694,7 @@ const VARIANTS = {
   wheel: { w: 600, h: 854, label: "D · Mandala กลีบบัว ❀" },
 } as const;
 
-const TF = "Tahoma, sans-serif";
+const TF = "'FC Iconic', Tahoma, sans-serif";
 const SERIF = "Georgia, 'Times New Roman', 'Tahoma', serif";
 function ShareCard({ data, variant }: { data: ApiResponse; variant: keyof typeof VARIANTS }) {
   const ref = useRef<SVGSVGElement>(null);
@@ -899,11 +899,11 @@ function ShareCard({ data, variant }: { data: ApiResponse; variant: keyof typeof
 
   return (
     <div style={{ ...cardStyle, padding: 10 }}>
-      <div style={{ fontSize: 13, color: "#2f6fb0", fontWeight: 700, marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 15, color: "#2f6fb0", fontWeight: 700, marginBottom: 6 }}>{label}</div>
       <div style={{ overflowX: "auto" }}>
         <svg ref={ref} width={w} height={h} viewBox={`0 0 ${w} ${h}`} xmlns="http://www.w3.org/2000/svg" style={{ display: "block", width: "100%", height: "auto", borderRadius: 16 }}>{body}</svg>
       </div>
-      <button onClick={() => downloadSvg(ref.current, w, h, `ดวง-${variant}-${data.name || "ดวง"}.png`)} style={{ marginTop: 8, width: "100%", background: "#2563eb", color: "#fff", border: "none", borderRadius: 8, padding: "8px", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>📥 บันทึก PNG</button>
+      <button onClick={() => downloadSvg(ref.current, w, h, `ดวง-${variant}-${data.name || "ดวง"}.png`)} style={{ marginTop: 8, width: "100%", background: "#2563eb", color: "#fff", border: "none", borderRadius: 8, padding: "8px", cursor: "pointer", fontSize: 15, fontWeight: 700 }}>📥 บันทึก PNG</button>
     </div>
   );
 }
@@ -918,7 +918,7 @@ function ShareCards({ data }: { data: ApiResponse }) {
 /* ---------- 1. ตารางฐาน ---------- */
 function BaseTable({ rows, natal, light }: { rows: ReturnType<typeof decompose>; natal: Natal[]; light?: boolean }) {
   const bd = light ? "#d5dcea" : "#2c3658";
-  const td: React.CSSProperties = { ...baseCell, width: COL, height: 26, fontSize: 13, borderLeftColor: bd, borderTopColor: bd, color: light ? "#2b3a5a" : undefined, background: light ? "#ffffff" : undefined };
+  const td: React.CSSProperties = { ...baseCell, width: COL, height: 26, fontSize: 15, borderLeftColor: bd, borderTopColor: bd, color: light ? "#2b3a5a" : undefined, background: light ? "#ffffff" : undefined };
   const lbl: React.CSSProperties = { ...td, width: LBL, textAlign: "right", paddingRight: 6, color: light ? "#5a6b8a" : "#9fb0d8", background: light ? "#eef2f9" : "#161d35" };
   const tbl: React.CSSProperties = { ...tableStyle(GRID_W + RGT), borderRightColor: bd, borderBottomColor: bd };
   return (
@@ -930,7 +930,7 @@ function BaseTable({ rows, natal, light }: { rows: ReturnType<typeof decompose>;
         <tr><td style={lbl}>ฐานปี</td>{rows.map((r, i) => <td key={i} style={td}>{r.yearB}</td>)}</tr>
         <tr><td style={lbl}>ผลรวม</td>{rows.map((r, i) => <td key={i} style={{ ...td, color: light ? "#8a95ad" : "#7b88ad" }}>{r.sum}</td>)}</tr>
         <tr><td style={{ ...lbl, fontWeight: 700 }}>เลขดวง</td>{rows.map((r, i) => <td key={i} style={{ ...td, fontWeight: 700, background: light ? "#eaf0fb" : "#1c274a", color: light ? "#2b5cab" : "#2f6fb0" }}>{r.total}</td>)}</tr>
-        <tr><td style={lbl}>วิธีชีวิต</td>{natal.map((n) => <td key={n.no} style={{ ...td, color: light ? "#2f9e57" : "#9fb0d8", fontSize: 10 }}>{n.name}</td>)}</tr>
+        <tr><td style={lbl}>วิธีชีวิต</td>{natal.map((n) => <td key={n.no} style={{ ...td, color: light ? "#2f9e57" : "#9fb0d8", fontSize: 13.5 }}>{n.name}</td>)}</tr>
       </tbody>
     </table>
   );
@@ -971,7 +971,7 @@ function LifeTimelineV({ natal, base12, centerAge, curAge, birthYear }: { natal:
             <circle cx={spineX} cy={y} r={6} fill={c} stroke="#ffffff" strokeWidth={2} />
             {/* ชื่อภพ + อายุ (ฝั่งบับเบิล) */}
             <text x={tx} y={y - 9} fill={isP ? "#b07d12" : c} fontSize={17} fontWeight={700} textAnchor={anc} fontFamily={TF}>{name}</text>
-            <text x={tx} y={y +12} fill="#5a6b8a" fontSize={10} textAnchor={anc} fontFamily={TF}>อายุ {age} · {realmShort(v)}{isP ? " ⛳" : ""}</text>
+            <text x={tx} y={y +12} fill="#5a6b8a" fontSize={11} textAnchor={anc} fontFamily={TF}>อายุ {age} · {realmShort(v)}{isP ? " ⛳" : ""}</text>
             {/* พ.ศ. (ฝั่งเส้นกลาง) */}
             <text x={yx} y={y - 3} fill="#26324d" fontSize={12} fontWeight={700} textAnchor={yanc} fontFamily={TF}>{year}</text>
             {/* คำทำนายของห้องที่ปีนั้นตก (จาก natal[].text) — บรรทัดเดียว */}
@@ -1022,10 +1022,10 @@ function LifeTimeline({ natal, base12, centerAge, curAge, birthYear }: { natal: 
       {/* บับเบิลเริ่ม/จบ */}
       <circle cx={sx} cy={rowY(0)} r={26} fill="#ffffff" stroke="#e0a31f" strokeWidth={2} />
       <text x={sx} y={rowY(0) - 1} fill="#b07d12" fontSize={11} fontWeight={700} textAnchor="middle" fontFamily={TF}>เริ่ม</text>
-      <text x={sx} y={rowY(0) + 12} fill="#5a6b8a" fontSize={9} textAnchor="middle" fontFamily={TF}>{birthYear + ages[0]! + 543}</text>
+      <text x={sx} y={rowY(0) + 12} fill="#5a6b8a" fontSize={10.5} textAnchor="middle" fontFamily={TF}>{birthYear + ages[0]! + 543}</text>
       <circle cx={ex} cy={rowY(2)} r={26} fill="#ffffff" stroke="#8a5fd0" strokeWidth={2} />
       <text x={ex} y={rowY(2) - 1} fill="#7a52c0" fontSize={11} fontWeight={700} textAnchor="middle" fontFamily={TF}>อนาคต</text>
-      <text x={ex} y={rowY(2) + 12} fill="#5a6b8a" fontSize={9} textAnchor="middle" fontFamily={TF}>{birthYear + ages[11]! + 543}</text>
+      <text x={ex} y={rowY(2) + 12} fill="#5a6b8a" fontSize={10.5} textAnchor="middle" fontFamily={TF}>{birthYear + ages[11]! + 543}</text>
       {nodes.map(({ age, k, x: nx, y: ny, v }) => {
         const c = realmHex(v), name = natal[12 - v]?.name ?? "", year = birthYear + age + 543;
         const isP = age === curAge + 1, isC = age === centerAge;
@@ -1039,7 +1039,7 @@ function LifeTimeline({ natal, base12, centerAge, curAge, birthYear }: { natal: 
             <circle cx={nx} cy={ny} r={5} fill={c} stroke="#ffffff" strokeWidth={1.5} />
             <text x={nx} y={ny + ts * 15} fill={isP ? "#b07d12" : c} fontSize={19} fontWeight={700} textAnchor="middle" fontFamily={TF}>{year}</text>
             <text x={nx} y={ny + ts * 31} fill="#26324d" fontSize={11.5} fontWeight={700} textAnchor="middle" fontFamily={TF}>{name}</text>
-            <text x={nx} y={ny + ts * 44} fill="#5a6b8a" fontSize={9.5} textAnchor="middle" fontFamily={TF}>อายุ {age} · {realmShort(v)}{isP ? " ⛳" : ""}</text>
+            <text x={nx} y={ny + ts * 44} fill="#5a6b8a" fontSize={10.5} textAnchor="middle" fontFamily={TF}>อายุ {age} · {realmShort(v)}{isP ? " ⛳" : ""}</text>
           </g>
         );
       })}
@@ -1181,12 +1181,12 @@ function LifeGraph({ natal, base12, centerAge, curAge, birthYear, birthLunarMont
         const labelY = below ? py + 14 : py - 22;
         return (
           <g key={i}>
-            <text x={px} y={py + (below ? -8 : 12)} fill="#6b7794" fontSize={9} textAnchor="middle">{Math.floor((v / 12) * 100)}%</text>
+            <text x={px} y={py + (below ? -8 : 12)} fill="#6b7794" fontSize={10.5} textAnchor="middle">{Math.floor((v / 12) * 100)}%</text>
             {isCenter && !isCur && <circle cx={px} cy={py} r={8} fill="none" stroke="#2f6fb0" strokeWidth={2} />}
             {isCur && <circle cx={px} cy={py} r={8} fill="#e0a31f" opacity={0.45} />}
             <circle cx={px} cy={py} r={4} fill={isCur ? "#e0a31f" : isCenter ? "#2f6fb0" : "#e23b3b"} stroke="#ffffff" strokeWidth={1.5} />
-            <text x={px} y={labelY} fill={isCur ? "#b07d12" : "#2f6fb0"} fontSize={10} fontWeight={isCur || isCenter ? 700 : 400} textAnchor="middle">{birthYear + age + 543}</text>
-            <text x={px} y={labelY + 11} fill="#8a95ad" fontSize={9} textAnchor="middle">อายุ {age} ปี</text>
+            <text x={px} y={labelY} fill={isCur ? "#b07d12" : "#2f6fb0"} fontSize={11} fontWeight={isCur || isCenter ? 700 : 400} textAnchor="middle">{birthYear + age + 543}</text>
+            <text x={px} y={labelY + 11} fill="#8a95ad" fontSize={10.5} textAnchor="middle">อายุ {age} ปี</text>
           </g>
         );
       })}
@@ -1202,7 +1202,7 @@ function YearTable({ data, centerAge, setCenterAge, curAge, light }: { data: Api
   const months = Array.from({ length: 12 }, (_, k) => THAI_MONTHS[(birthMon - 1 + k) % 12]);
   const zodiacs = Array.from({ length: 12 }, (_, c) => ZODIAC[(((birthYear + c) % 12) + 12) % 12]);
   const bd = light ? "#d5dcea" : "#2c3658";
-  const td: React.CSSProperties = { ...baseCell, width: COL, fontSize: 11, paddingTop: 1, paddingBottom: 1, borderLeftColor: bd, borderTopColor: bd, background: light ? "#ffffff" : undefined };
+  const td: React.CSSProperties = { ...baseCell, width: COL, fontSize: 14, paddingTop: 1, paddingBottom: 1, borderLeftColor: bd, borderTopColor: bd, background: light ? "#ffffff" : undefined };
   const lbl: React.CSSProperties = { ...td, width: LBL, textAlign: "right", paddingRight: 6, color: light ? "#5a6b8a" : "#9fb0d8", background: light ? "#eef2f9" : "#161d35" };
   const tbl: React.CSSProperties = { ...tableStyle(GRID_W + RGT), borderRightColor: bd, borderBottomColor: bd };
   const maxAge = 96;
@@ -1212,7 +1212,7 @@ function YearTable({ data, centerAge, setCenterAge, curAge, light }: { data: Api
       <tbody>
         <tr><td style={lbl}>เดือน</td>{months.map((m, i) => <td key={i} style={{ ...td, color: light ? "#5a6b8a" : "#9fb0d8" }}>{m}</td>)}
           <td rowSpan={2 + rowCount} style={{ ...td, width: RGT, background: light ? "#eef2f9" : "#161d35" }} /></tr>
-        <tr><td style={lbl}>ปีนักษัตร</td>{zodiacs.map((z, i) => <td key={i} style={{ ...td, color: light ? "#b07d12" : "#c8a96b", fontSize: 10 }}>{z}</td>)}</tr>
+        <tr><td style={lbl}>ปีนักษัตร</td>{zodiacs.map((z, i) => <td key={i} style={{ ...td, color: light ? "#b07d12" : "#c8a96b", fontSize: 13.5 }}>{z}</td>)}</tr>
         {Array.from({ length: rowCount }, (_, r) => (
           <tr key={r}>
             <td style={lbl}>{r === 0 ? "พ.ศ. / อายุ" : ""}</td>
@@ -1227,7 +1227,7 @@ function YearTable({ data, centerAge, setCenterAge, curAge, light }: { data: Api
               return (
                 <td key={c} onClick={() => setCenterAge(age)} style={{ ...td, cursor: "pointer", background: bg }}>
                   <div style={{ color: isCur ? (light ? "#b07d12" : "#ffd23f") : (light ? "#2b5cab" : "#2f6fb0"), fontWeight: isCur || isCenter ? 700 : 400 }}>{birthYear + age + 543}</div>
-                  <div style={{ color: light ? "#8a95ad" : "#7b88ad", fontSize: 10 }}>{age}</div>
+                  <div style={{ color: light ? "#8a95ad" : "#7b88ad", fontSize: 13.5 }}>{age}</div>
                 </td>
               );
             })}
@@ -1247,9 +1247,9 @@ function NatalReadings({ natal }: { natal: Natal[] }) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 8 }}>
         {natal.map((n) => (
           <div key={n.no} style={{ border: "1px solid #e4e9f2", borderRadius: 8, padding: 10, background: "#ffffff", boxShadow: "0 1px 3px rgba(30,41,77,0.06)" }}>
-            <div style={{ fontWeight: 700 }}>{n.name} — เลข {n.value} <span style={{ color: realmColor(n.realm), fontSize: 12 }}>({n.realm})</span></div>
-            <div style={{ fontSize: 11, opacity: 0.6, margin: "4px 0" }}>{n.meaning}</div>
-            <div style={{ fontSize: 12, opacity: 0.85 }}>{n.text}</div>
+            <div style={{ fontWeight: 700 }}>{n.name} — เลข {n.value} <span style={{ color: realmColor(n.realm), fontSize: 14 }}>({n.realm})</span></div>
+            <div style={{ fontSize: 14, opacity: 0.6, margin: "4px 0" }}>{n.meaning}</div>
+            <div style={{ fontSize: 14, opacity: 0.85 }}>{n.text}</div>
           </div>
         ))}
       </div>
@@ -1260,6 +1260,6 @@ function NatalReadings({ natal }: { natal: Natal[] }) {
 const inputStyle: React.CSSProperties = { padding: "8px 12px", borderRadius: 8, border: "1px solid #cbd5e8", background: "#ffffff", color: "#26324d" };
 const btnStyle: React.CSSProperties = { padding: "8px 16px", borderRadius: 8, border: "none", background: "#2f6fe0", color: "#ffffff", fontWeight: 600, cursor: "pointer" };
 const fieldStyle: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 3 };
-const capStyle: React.CSSProperties = { fontSize: 11, color: "#5a6b8a" };
+const capStyle: React.CSSProperties = { fontSize: 14, color: "#5a6b8a" };
 const selectStyle: React.CSSProperties = { padding: "8px 8px", borderRadius: 8, border: "1px solid #cbd5e8", background: "#ffffff", color: "#26324d" };
 const cardStyle: React.CSSProperties = { border: "1px solid #e4e9f2", borderRadius: 10, padding: 12, background: "#ffffff", marginTop: 8, boxShadow: "0 1px 3px rgba(30,41,77,0.06)" };

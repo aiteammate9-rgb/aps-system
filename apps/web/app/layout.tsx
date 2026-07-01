@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import "./globals.css";
 
 export const metadata = {
   title: "ดูดวงกราฟชีวิต",
@@ -10,7 +11,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="th">
       <body
         style={{
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: '"FC Iconic", Tahoma, sans-serif',
           margin: 0,
           background: "#f5f7fb",
           color: "#26324d",
