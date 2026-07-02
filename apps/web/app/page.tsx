@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { CELEBS, type Celeb } from "./celebs";
-import { text } from "stream/consumers";
+import { HOUSE_MONTHLY } from "./monthly-data";
 
 interface Natal {
   no: number;
@@ -39,6 +39,7 @@ interface Divination {
     kalakiniPlanet: string; avoidColor: string;
     sriPlanet: string; luckColor: string;
     dechPlanet: string; powerColor: string;
+    text: string;
   };
   rasi: { name: string; element: string; ruler: string; text: string };
   numerology: { sum: number; root: number; text: string };
@@ -210,18 +211,7 @@ function Result({ data, viewDate }: { data: ApiResponse; viewDate: string }) {
       <InfoBanner data={data} curAge={curAge} />
       <div style={{ width: GRID_W + RGT }}>
         <BaseTable rows={rows} natal={data.natal} light />
-        <div style={{ display: "flex", gap: 8, margin: "10px 0", flexWrap: "wrap" }}>
-          {([["full", "📊 แบบเต็ม"], ["v", "📜 แนวตั้ง"], ["h", "🗺️ งูเลื้อย"], ["line", "📈 กราฟเส้น"]] as const).map(([k, lbl]) => {
-            const on = k === view;
-            return (
-              <button key={k} onClick={() => setView(k)} style={{
-                padding: "6px 14px", borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: "pointer",
-                border: on ? "1px solid #2f6fe0" : "1px solid #d5dcea",
-                background: on ? "#e7efff" : "#ffffff", color: on ? "#2f6fe0" : "#6b7794",
-              }}>{lbl}</button>
-            );
-          })}
-        </div>
+        <div style={{ height: 10 }} />
         {view !== "line" && (
           <div style={{ fontWeight: 700, color: "#2f6fb0", fontSize: 16, fontFamily: TF, padding: "8px 6px", background: "#eef2f9", borderRadius: "10px 10px 0 0", border: "1px solid #e2e7f0", borderBottom: "none" }}>
             {view === "full" ? "📊 กราฟพยากรณ์ชีวิต ๑๒ ตัว" : view === "v" ? "📜 ไทม์ไลน์ชีวิต — เลขดวงรายปี" : "🗺️ ไทม์ไลน์ชีวิต — เลขดวงรายปี (สูง=ดี · ต่ำ=ระวัง)"}
@@ -292,53 +282,52 @@ function TransitBanner({ data }: { data: ApiResponse }) {
 function SectionHead({ children }: { children: React.ReactNode }) {
   return <h2 style={{ fontSize: 18, borderBottom: "2px solid #dbe2ee", paddingBottom: 6, marginTop: 28, color: "#26324d" }}>{children}</h2>;
 }
+// ป้ายเกณฑ์คู่ภพ (เลขสัมพันธ์) ยึดค่าเลข: 9-12 ดี(สวรรค์) · 5-8 ปานกลาง(มนุษย์) · 1-4 ต่ำ(นรก) · วินาศเลขสูง=ระวังพิเศษ
+function relTag(value: number, winat: boolean): { s: string; c: string } {
+  if (winat && value >= 9) return { s: "ระวังพิเศษ", c: "#ff6b6b" };
+  if (value >= 9) return { s: "เกณฑ์ดีมาก", c: "#37d67a" };
+  if (value >= 5) return { s: "ปานกลาง", c: "#d9a406" };
+  return { s: "เกณฑ์ต่ำ · ระวัง", c: "#ff6b6b" };
+}
+// คำทำนายคู่ภพ (เลขสัมพันธ์) แบบยาว-ลึก — ผสมความหมายของสองภพ + เกณฑ์ตามค่าเลข
+function relationDeep(a: string, b: string, value: number, houses: string[]): string {
+  const aspA = HOUSE_MONTHLY[a]?.aspect ?? `เรื่อง${a}`;
+  const aspB = HOUSE_MONTHLY[b]?.aspect ?? `เรื่อง${b}`;
+  const winat = houses.includes("วินาศ");
+  const realmName = value >= 9 ? "สวรรค์ภูมิ · เกณฑ์ดีมาก" : value >= 5 ? "มนุษย์ภูมิ · เกณฑ์ปานกลาง" : "นรกภูมิ · เกณฑ์ต่ำ";
+  const lead = `เรื่อง${a} (${aspA}) กับ ${b} (${aspB}) ผูกโยงถึงกันอย่างชัดเจน เพราะตกเลข ${toThaiNum(value)} เหมือนกัน — เป็นเลข${realmName}`;
+  if (winat && value >= 9) {
+    return `${lead} แม้เป็นเลขสูง แต่มีภพวินาศ (การสูญเสีย/รายจ่าย) ร่วมอยู่ด้วย ยิ่งเลขแรงยิ่งต้องระวังเป็นพิเศษ เพราะพลังสองด้านนี้อาจเทไปทางการสูญเสียได้มาก ควรรอบคอบเรื่องการเงินและการตัดสินใจ อย่าประมาทกับสิ่งที่ดูเหมือนจะดี และเผื่อทางถอยไว้เสมอ`;
+  }
+  if (value >= 9) {
+    return `${lead} ทั้งสองด้านจึงเกื้อหนุนกันในทางที่ดี เมื่อด้านหนึ่งเดินหน้าได้สวย อีกด้านมักพลอยรุ่งเรืองตามไปด้วยอย่างเป็นธรรมชาติ นับเป็นจุดแข็งของดวงที่ควรใช้ให้เต็มที่ เหมาะกับการวางแผนพัฒนาสองเรื่องนี้ควบคู่กันไป เพราะจะเสริมกันให้ก้าวหน้าเร็วและมั่นคงกว่าการทำแยกกัน หากต่อยอดต่อเนื่องจะสร้างความสำเร็จที่ยั่งยืน`;
+  }
+  if (value >= 5) {
+    return `${lead} สองด้านนี้ส่งผลถึงกันในระดับปานกลาง ไม่ถึงกับดีเด่นแต่ก็ไม่ถึงกับแย่ ขึ้นอยู่กับการดูแลของเราเป็นสำคัญ ขอเพียงประคองให้สมดุล ใส่ใจอย่างสม่ำเสมอ และใช้ความสามารถของตนอย่างเต็มที่ ทั้งคู่ก็จะค่อย ๆ ดีขึ้นไปด้วยกัน อย่าประมาทก็จะราบรื่น`;
+  }
+  return `${lead} ทั้งสองด้านนี้จึงเป็นจุดที่ต้องระมัดระวังเป็นพิเศษ เพราะส่งผลกระทบถึงกันโดยตรง หากด้านหนึ่งอ่อนแอหรือสะดุด อีกด้านมักพลอยแย่ตามไปด้วย ควรเอาใจใส่ดูแลทั้งคู่ให้ดี ค่อย ๆ สร้างเหตุที่ดี ไม่ประมาท และหมั่นแก้ไขจุดอ่อนแต่เนิ่น ๆ เพื่อไม่ให้สองด้านนี้ดึงกันให้ทรุดลงไปพร้อมกัน`;
+}
 function Predictions({ data, centerAge }: { data: ApiResponse; centerAge: number }) {
   const birthYear = Number(data.birth.solarDate.slice(0, 4));
-  const win = Array.from({ length: 12 }, (_, i) => {
-    const age = centerAge + 1 + i;
-    return { age, year: birthYear + age + 543, v: data.result.base12[((age % 12) + 12) % 12]! };
-  });
-  const hi = win.reduce((a, b) => (b.v > a.v ? b : a));
-  const lo = win.reduce((a, b) => (b.v < a.v ? b : a));
   return (
     <div>
       <SectionHead>1. ทำนายพื้นดวง</SectionHead>
-      <h3 style={{ color: "#2f6fb0" }}>ทำนายตรง (ภพที่ตกเลขเดียวกัน ≥ 2)</h3>
+      <h3 style={{ color: "#2f6fb0" }}>ทำนายเลขดวงสัมพันธ์ (ภพที่ตกเลขเดียวกัน ≥ 2)</h3>
       {data.repeatedGroups.length === 0 && <p style={{ opacity: 0.6 }}>ไม่มีภพที่ตกเลขซ้ำกัน</p>}
       {data.repeatedGroups.flatMap((g) =>
-        g.pairs.map((p, i) => (
-          <div key={g.value + "-" + i} style={cardStyle}>
-            <div style={{ fontWeight: 700 }}>{p.a} สัมพันธ์กับ {p.b} <span style={{ color: "#ffd23f" }}>ตกเลข {g.value}</span></div>
-            <div style={{ fontSize: 15, opacity: 0.85, marginTop: 4 }}>{p.text ?? "(ยังไม่มีคำทำนายคู่นี้ในคลัง)"}</div>
-          </div>
-        ))
+        g.pairs.map((p, i) => {
+          const tn = relTag(g.value, hasWinat(g.houses));
+          return (
+            <div key={g.value + "-" + i} style={{ ...cardStyle, borderLeft: `4px solid ${tn.c}` }}>
+              <div style={{ fontWeight: 700, fontSize: 15.5 }}>{p.a} สัมพันธ์กับ {p.b} <span style={{ color: tn.c }}>· ตกเลข {toThaiNum(g.value)} · {tn.s}</span></div>
+              <div style={{ fontSize: 14.5, marginTop: 5, lineHeight: 1.75 }}>{relationDeep(p.a, p.b, g.value, g.houses)}</div>
+              <div style={{ fontSize: 13, color: "#8a95ad", marginTop: 6 }}>เกณฑ์เลข {toThaiNum(g.value)}: {realmText(g.value)}</div>
+            </div>
+          );
+        })
       )}
-      <h3 style={{ color: "#2f6fb0", marginTop: 18 }}>คำทำนายระดับเลข (12 ภพ)</h3>
-      <NatalReadings natal={data.natal} />
-
-      <SectionHead>2. ทำนายดวงชะตาจร</SectionHead>
-      <TransitBanner data={data} />
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <div style={{ ...cardStyle, flex: 1, minWidth: 240, border: "1px solid #2e6b3e" }}>
-          <div style={{ fontWeight: 700, color: "#37d67a" }}>📈 ช่วงกราฟขึ้นสูง (ดี)</div>
-          <div style={{ marginTop: 4 }}>พ.ศ. {hi.year} · อายุ {hi.age} ปี · เลข {hi.v} ({Math.floor((hi.v / 12) * 100)}%)</div>
-          <div style={{ fontSize: 14, opacity: 0.8, marginTop: 4 }}>จังหวะชีวิตดี เหมาะริเริ่ม ลงทุน ตัดสินใจเรื่องสำคัญ</div>
-        </div>
-        <div style={{ ...cardStyle, flex: 1, minWidth: 240, border: "1px solid #6b2e2e" }}>
-          <div style={{ fontWeight: 700, color: "#ff6b6b" }}>📉 ช่วงกราฟลงต่ำ (ระวัง)</div>
-          <div style={{ marginTop: 4 }}>พ.ศ. {lo.year} · อายุ {lo.age} ปี · เลข {lo.v} ({Math.floor((lo.v / 12) * 100)}%)</div>
-          <div style={{ fontSize: 14, opacity: 0.8, marginTop: 4 }}>ควรระมัดระวัง ตั้งรับ หลีกเลี่ยงความเสี่ยงใหญ่</div>
-        </div>
-      </div>
-      {data.yearlyTransits.map((t) => (
-        <div key={t.age}>
-          <h3 style={{ color: "#2f6fb0", marginTop: 18 }}>
-            คำทำนายประจำปี อายุ {t.age - 1}–{t.age} ปี (พ.ศ. {birthYear + t.age - 1 + 543}–{birthYear + t.age + 543})
-            <span style={{ color: "#ffd23f", fontSize: 16 }}> (เลข {t.value})</span>
-          </h3>
-          <div style={{ ...cardStyle, whiteSpace: "pre-wrap", lineHeight: 1.7, fontSize: 15 }}>{t.poem || "(ไม่มีกลอน)"}</div>
-        </div>
-      ))}
+      <SectionHead>2. คำทำนายรายเดือน 🗓️</SectionHead>
+      <MonthlyForecast data={data} />
 
       <SectionHead>3. ทำนายตามวันเกิดและเดือนเกิด</SectionHead>
       <h3 style={{ color: "#2f6fb0" }}>คำทำนายตามวันเกิด (วัน{data.weekday.name})</h3>
@@ -350,12 +339,12 @@ function Predictions({ data, centerAge }: { data: ApiResponse; centerAge: number
       <Divination d={data.divination} />
 
       <SectionHead>5. คู่สมพงษ์ (เทียบ 2 ดวง)</SectionHead>
-      <Compatibility personADate={data.birth.solarDate} />
+      <Compatibility data={data} />
 
       <SectionHead>6. จับคู่ดารา/ไอดอล 🌟</SectionHead>
       <CelebMatch personADate={data.birth.solarDate} />
 
-      <SectionHead>7. การ์ดดวงแชร์ได้ 📤 (4 สไตล์ เลือกบันทึกได้)</SectionHead>
+      <SectionHead>7. การ์ดดวงแชร์ได้ 📤 (เลือกบันทึกได้)</SectionHead>
       <ShareCards data={data} />
     </div>
   );
@@ -382,6 +371,7 @@ function Divination({ d }: { d: Divination }) {
           <div>👑 <b style={{ color: "#ffd23f" }}>สีเสริมอำนาจ (เดช):</b> {taksa.powerColor}</div>
           <div>⛔ <b style={{ color: "#ff6b6b" }}>สีต้องห้าม (กาลกิณี={taksa.kalakiniPlanet}):</b> {taksa.avoidColor}</div>
         </div>
+        <div style={{ marginTop: 8, fontSize: 14.5, lineHeight: 1.7, opacity: 0.92 }}>{taksa.text}</div>
       </div>
       {/* ราศี */}
       <div style={{ ...cardStyle }}>
@@ -415,12 +405,19 @@ function Divination({ d }: { d: Divination }) {
   );
 }
 
-/* ---------- 5. คู่สมพงษ์ (เทียบ 2 คน) ---------- */
-function Compatibility({ personADate }: { personADate: string }) {
+/* ---------- 5. คู่สมพงษ์ (2 โหมด: หาเนื้อคู่อัตโนมัติ / ระบุวันเกิดเอง) ---------- */
+const NAKS_TH = ["", "ชวด", "ฉลู", "ขาล", "เถาะ", "มะโรง", "มะเส็ง", "มะเมีย", "มะแม", "วอก", "ระกา", "จอ", "กุน"];
+const LIUHE_MAP: Record<number, number> = { 1: 2, 2: 1, 3: 12, 12: 3, 4: 11, 11: 4, 5: 10, 10: 5, 6: 9, 9: 6, 7: 8, 8: 7 };
+const ELEM_GOOD: Record<string, string[]> = { ไฟ: ["ไฟ", "ลม"], ลม: ["ลม", "ไฟ"], ดิน: ["ดิน", "น้ำ"], น้ำ: ["น้ำ", "ดิน"] };
+const ELEM_BAD: Record<string, string[]> = { ไฟ: ["ดิน", "น้ำ"], ลม: ["ดิน", "น้ำ"], ดิน: ["ไฟ", "ลม"], น้ำ: ["ไฟ", "ลม"] };
+function Compatibility({ data }: { data: ApiResponse }) {
+  const personADate = data.birth.solarDate;
+  const [mode, setMode] = useState<"auto" | "manual">("auto");
   const [bDay, setBDay] = useState(15);
   const [bMonth, setBMonth] = useState(8);
   const [bYear, setBYear] = useState(1995);
   const [res, setRes] = useState<CompatResult | null>(null);
+  const [gap, setGap] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const check = async () => {
@@ -433,30 +430,68 @@ function Compatibility({ personADate }: { personADate: string }) {
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || "error");
+      const months = Math.abs(Math.round((new Date(personADate).getTime() - new Date(bDate).getTime()) / (30.44 * 864e5)));
+      const gy = Math.floor(months / 12), gm = months % 12;
+      setGap(gy > 0 ? `${gy} ปี${gm ? ` ${gm} เดือน` : ""}` : `${gm} เดือน`);
       setRes(j);
     } catch (e) { setErr(e instanceof Error ? e.message : "error"); }
     finally { setLoading(false); }
   };
   const sel: React.CSSProperties = { background: "#ffffff", color: "#26324d", border: "1px solid #cbd5e8", borderRadius: 6, padding: "6px 8px" };
+  // โหมดหาเนื้อคู่ — จากนักษัตร+ธาตุของเจ้าชะตา
+  const myNak = data.birthInfo.naksatr, myElem = data.divination.rasi.element;
+  const goodNaks = [NAKS_TH[((myNak + 4 - 1) % 12) + 1], NAKS_TH[((myNak + 8 - 1) % 12) + 1], NAKS_TH[LIUHE_MAP[myNak]!]].filter(Boolean);
+  const chongNak = NAKS_TH[((myNak + 6 - 1) % 12) + 1];
+  const goodElems = ELEM_GOOD[myElem] ?? [], badElems = ELEM_BAD[myElem] ?? [];
   return (
     <div style={{ ...cardStyle }}>
-      <div style={{ fontSize: 15, color: "#9fb0d8", marginBottom: 8 }}>วันเกิดคนที่ 1 = ดวงด้านบน · กรอกวันเกิดคนที่ 2 เพื่อเทียบ</div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-        <select value={bDay} onChange={(e) => setBDay(+e.target.value)} style={sel}>{Array.from({ length: 31 }, (_, i) => <option key={i} value={i + 1}>{i + 1}</option>)}</select>
-        <select value={bMonth} onChange={(e) => setBMonth(+e.target.value)} style={sel}>{THAI_MONTHS_FULL.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}</select>
-        <select value={bYear} onChange={(e) => setBYear(+e.target.value)} style={sel}>{Array.from({ length: 121 }, (_, i) => 1917 + i).map((y) => <option key={y} value={y}>{y}</option>)}</select>
-        <button onClick={check} disabled={loading} style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 6, padding: "7px 16px", cursor: "pointer" }}>{loading ? "กำลังเทียบ..." : "เช็กคู่สมพงษ์"}</button>
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+        {([["auto", "🔮 หาเนื้อคู่ (จากดวง)"], ["manual", "✍️ ระบุวันเกิดเอง"]] as const).map(([k, lbl]) => {
+          const on = k === mode;
+          return <button key={k} onClick={() => setMode(k)} style={{ padding: "6px 14px", borderRadius: 14, fontSize: 13.5, fontWeight: 700, cursor: "pointer", border: on ? "1px solid #2f6fe0" : "1px solid #d5dcea", background: on ? "#e7efff" : "#ffffff", color: on ? "#2f6fe0" : "#6b7794" }}>{lbl}</button>;
+        })}
       </div>
-      {err && <div style={{ color: "#ff6b6b", marginTop: 8 }}>{err}</div>}
-      {res && (
-        <div style={{ marginTop: 12 }}>
-          <div style={{ fontSize: 32, fontWeight: 800, color: "#ffd23f" }}>{res.compatibility.emoji} เข้ากัน {res.compatibility.percent}%</div>
-          <div style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>{res.compatibility.level}</div>
-          <div style={{ marginTop: 6, fontSize: 15, lineHeight: 1.8 }}>
-            <div>นักษัตร {res.a.naksatrName} ↔ {res.b.naksatrName} : <b style={{ color: "#ffd23f" }}>{res.compatibility.naksatrRel}</b></div>
-            <div>ธาตุราศี {res.a.rasiElement} ↔ {res.b.rasiElement} : <b style={{ color: "#ffd23f" }}>{res.compatibility.elementRel}</b></div>
-            <div>วันเกิด : {res.compatibility.weekdayRel}</div>
+      {mode === "auto" ? (
+        <div>
+          <div style={{ fontSize: 15, marginBottom: 8 }}>เจ้าชะตา: ปีนักษัตร <b style={{ color: "#2f6fb0" }}>{data.birthInfo.naksatrName}</b> · ธาตุ <b style={{ color: "#2f6fb0" }}>{myElem}</b></div>
+          <div style={{ ...cardStyle, borderLeft: "4px solid #2f9e57", marginTop: 0 }}>
+            <div style={{ fontWeight: 700, color: "#2f9e57", fontSize: 15.5 }}>✅ เนื้อคู่ที่เข้ากัน</div>
+            <div style={{ marginTop: 4, fontSize: 15, lineHeight: 1.8 }}>
+              <div>🐉 <b>นักษัตร:</b> {goodNaks.join(" · ")} <span style={{ color: "#8a95ad", fontSize: 13 }}>(สามฮะ + ลิ่วฮะ)</span></div>
+              <div>🌿 <b>ธาตุ:</b> {goodElems.join(" · ")}</div>
+            </div>
           </div>
+          <div style={{ ...cardStyle, borderLeft: "4px solid #d63a3a" }}>
+            <div style={{ fontWeight: 700, color: "#d63a3a", fontSize: 15.5 }}>⚠️ ควรหลีกเลี่ยง</div>
+            <div style={{ marginTop: 4, fontSize: 15, lineHeight: 1.8 }}>
+              <div>🐉 <b>นักษัตร:</b> {chongNak} <span style={{ color: "#8a95ad", fontSize: 13 }}>(ปีชง — ตรงข้าม)</span></div>
+              <div>🌿 <b>ธาตุ:</b> {badElems.join(" · ")} <span style={{ color: "#8a95ad", fontSize: 13 }}>(ต่างขั้ว)</span></div>
+            </div>
+          </div>
+          <div style={{ fontSize: 13, color: "#8a95ad", marginTop: 6 }}>💡 นักษัตรที่เข้ากันไม่ได้แปลว่าคู่อื่นคบไม่ได้ — เป็นแนวโน้มเสริมดวง หากอยากเทียบคู่จริง กด "✍️ ระบุวันเกิดเอง"</div>
+        </div>
+      ) : (
+        <div>
+          <div style={{ fontSize: 15, color: "#5a6b8a", marginBottom: 8 }}>วันเกิดคนที่ 1 = ดวงด้านบน · กรอกวันเกิดคนที่ 2 เพื่อเทียบ</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            <select value={bDay} onChange={(e) => setBDay(+e.target.value)} style={sel}>{Array.from({ length: 31 }, (_, i) => <option key={i} value={i + 1}>{i + 1}</option>)}</select>
+            <select value={bMonth} onChange={(e) => setBMonth(+e.target.value)} style={sel}>{THAI_MONTHS_FULL.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}</select>
+            <select value={bYear} onChange={(e) => setBYear(+e.target.value)} style={sel}>{Array.from({ length: 121 }, (_, i) => 1917 + i).map((y) => <option key={y} value={y}>{y}</option>)}</select>
+            <button onClick={check} disabled={loading} style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 6, padding: "7px 16px", cursor: "pointer" }}>{loading ? "กำลังเทียบ..." : "เช็กคู่สมพงษ์"}</button>
+          </div>
+          {err && <div style={{ color: "#ff6b6b", marginTop: 8 }}>{err}</div>}
+          {res && (
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontSize: 32, fontWeight: 800, color: "#ffd23f" }}>{res.compatibility.emoji} เข้ากัน {res.compatibility.percent}%</div>
+              <div style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>{res.compatibility.level}</div>
+              <div style={{ marginTop: 6, fontSize: 15, lineHeight: 1.8 }}>
+                <div>อายุต่างกัน : <b style={{ color: "#2f6fb0" }}>{gap}</b></div>
+                <div>นักษัตร {res.a.naksatrName} ↔ {res.b.naksatrName} : <b style={{ color: "#ffd23f" }}>{res.compatibility.naksatrRel}</b></div>
+                <div>ธาตุราศี {res.a.rasiElement} ↔ {res.b.rasiElement} : <b style={{ color: "#ffd23f" }}>{res.compatibility.elementRel}</b></div>
+                <div>วันเกิด : {res.compatibility.weekdayRel}</div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -673,25 +708,46 @@ const kanokRow = (x0: number, y: number, width: number, n: number, dir: 1 | -1, 
   const u = width / n;
   return <g fill={fill} opacity={op}>{Array.from({ length: n }, (_, i) => <path key={i} d={flamePath(u, 13)} transform={`translate(${x0 + i * u} ${y}) scale(1 ${dir})`} />)}</g>;
 };
-function downloadSvg(svg: SVGSVGElement | null, w: number, h: number, name: string) {
+// แปลง SVG → PNG blob (คมชัด 2x)
+function svgToPngBlob(svg: SVGSVGElement, w: number, h: number): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    const xml = new XMLSerializer().serializeToString(svg);
+    const url = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement("canvas");
+      cv.width = w * 2; cv.height = h * 2;
+      const ctx = cv.getContext("2d"); if (!ctx) return resolve(null);
+      ctx.scale(2, 2); ctx.drawImage(img, 0, 0);
+      cv.toBlob((blob) => resolve(blob), "image/png");
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+async function downloadSvg(svg: SVGSVGElement | null, w: number, h: number, name: string) {
   if (!svg) return;
-  const xml = new XMLSerializer().serializeToString(svg);
-  const url = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
-  const img = new Image();
-  img.onload = () => {
-    const cv = document.createElement("canvas");
-    cv.width = w * 2; cv.height = h * 2;
-    const ctx = cv.getContext("2d"); if (!ctx) return;
-    ctx.scale(2, 2); ctx.drawImage(img, 0, 0);
-    cv.toBlob((blob) => { if (!blob) return; const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); });
-  };
-  img.src = url;
+  const blob = await svgToPngBlob(svg, w, h); if (!blob) return;
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+}
+// แชร์รูปการ์ด — มือถือเด้ง share sheet (LINE/IG/FB); คอมไม่รองรับ → บันทึกแทน
+async function shareSvg(svg: SVGSVGElement | null, w: number, h: number, name: string) {
+  if (!svg) return;
+  const blob = await svgToPngBlob(svg, w, h); if (!blob) return;
+  const file = new File([blob], name, { type: "image/png" });
+  const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
+  if (nav.canShare && nav.canShare({ files: [file] })) {
+    try { await nav.share({ files: [file], title: "ดูดวงกราฟชีวิต Sheowa.com", text: "การ์ดดวงของฉัน 🔮" }); return; }
+    catch { /* ผู้ใช้ยกเลิก/ผิดพลาด → ตกไปบันทึกแทน */ }
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click();
 }
 const VARIANTS = {
   cosmic: { w: 600, h: 854, label: "A · Cosmic Night 🌌" },
   royal: { w: 600, h: 854, label: "B · Royal Gold 👑" },
   pastel: { w: 600, h: 854, label: "C · Pastel Cute 🌸" },
   wheel: { w: 600, h: 854, label: "D · Mandala กลีบบัว ❀" },
+  radar: { w: 600, h: 854, label: "E · เส้นโยง ๑๒ ภพ 🕸️" },
 } as const;
 
 const TF = "'FC Iconic', Tahoma, sans-serif";
@@ -835,7 +891,7 @@ function ShareCard({ data, variant }: { data: ApiResponse; variant: keyof typeof
       <text x={w / 2} y={bannerY + 31} fill="#fff" fontSize={18} fontWeight="bold" textAnchor="middle" fontFamily={TF}>✨ ดวงปัง! สายมูห้ามพลาด ✨</text>
       <text x={w / 2} y={h - 26} fill={MUT} fontSize={13} textAnchor="middle" fontFamily={TF}>♡ APS-System · ดวงชีวิต ๑๒ ตัว ♡</text>
     </>;
-  } else {
+  } else if (variant === "wheel") {
     const cx = w / 2, cy = 326, circR = 80;
     // กลีบบัว: ฐานมนด้านใน (r0) ปลายแหลมพุ่งออกนอก — สูง=lenPx, กว้าง=halfW*2 (พิกเซล)
     const petal = (r0: number, lenPx: number, a: number, halfW: number) => {
@@ -895,6 +951,38 @@ function ShareCard({ data, variant }: { data: ApiResponse; variant: keyof typeof
         : rels.slice(0, 3).map((g, i) => { const tn = relTone(g.value, hasWinat(g.houses)); return <text key={i} x={cx} y={688 + i * 22} fill="#e8ecf5" fontSize={12.5} textAnchor="middle" fontFamily={TF}>เลข {toThaiNum(g.value)}: {g.houses.join("+")} <tspan fill={tn.c} fontWeight="bold">({tn.s} · {realmShort(g.value)})</tspan></text>; })}
       {([["☁️ สวรรค์", heaven, "#37d67a"], ["🧍 มนุษย์", human, "#ffd23f"], ["🔥 นรก", hell, "#ff6b6b"]] as const).map(([t, c, col], i) => { const pw = 168, px = w / 2 - (pw * 3 + 20) / 2 + i * (pw + 10), py = 760; return <g key={t}><rect x={px} y={py} width={pw} height={40} rx={20} fill={col + "22"} stroke={col + "66"} /><text x={px + pw / 2} y={py + 26} fill={col} fontSize={15} fontWeight="bold" textAnchor="middle" fontFamily={TF}>{t} {toThaiNum(c)} ภพ</text></g>; })}
     </>;
+  } else if (variant === "radar") {
+    const cx = w / 2, cy = 380, R = 208, N = data.natal;
+    const pt = (i: number, f: number) => polar(cx, cy, R * f, i * 30); // 12 แกน เริ่มบนสุด
+    const toPath = (pts: [number, number][]) => pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(" ") + " Z";
+    const dataPoly = N.map((n, i) => pt(i, n.value / 12));
+    body = <>
+      <rect x={0} y={0} width={w} height={h} rx={16} fill="#ffffff" stroke="#e4e9f2" />
+      <text x={cx} y={52} fill="#26324d" fontSize={26} fontWeight="bold" textAnchor="middle" fontFamily={TF}>🕸️ เส้นโยง ๑๒ ภพ</text>
+      <text x={cx} y={82} fill="#2f6fb0" fontSize={18} fontWeight="bold" textAnchor="middle" fontFamily={TF}>{name}</text>
+      <text x={cx} y={106} fill="#8a95ad" fontSize={13} textAnchor="middle" fontFamily={TF}>{v.rasi.name} · ปี{b.naksatrName} · {toThaiNum(d!)} {THAI_MONTHS_FULL[m! - 1]} พ.ศ.{toThaiNum(b.be)}</text>
+      {/* วงกริด 5 ชั้น */}
+      {[0.2, 0.4, 0.6, 0.8, 1].map((f, ri) => <path key={"g" + ri} d={toPath(N.map((_, i) => pt(i, f)))} fill="none" stroke="#e2e7f0" strokeWidth={1} />)}
+      {/* แกน 12 เส้น */}
+      {N.map((_, i) => { const [ex, ey] = pt(i, 1); return <line key={"a" + i} x1={cx} y1={cy} x2={ex} y2={ey} stroke="#dce3ee" strokeWidth={1} />; })}
+      {/* ป้าย % แนวตั้ง */}
+      {[0.2, 0.4, 0.6, 0.8, 1].map((f, ri) => { const [, py] = pt(0, f); return <text key={"p" + ri} x={cx + 5} y={py + 4} fill="#aab4c8" fontSize={10} fontFamily={TF}>{f * 100}%</text>; })}
+      {/* โพลิกอนเต็ม ๑๒ (เป้าหมาย) */}
+      <path d={toPath(N.map((_, i) => pt(i, 1)))} fill="none" stroke="#e8933a" strokeWidth={2} opacity={0.75} />
+      {/* โพลิกอนเลขดวงจริง */}
+      <path d={toPath(dataPoly)} fill="#2f6fe024" stroke="#2f6fe0" strokeWidth={2.5} strokeLinejoin="round" />
+      {dataPoly.map((p, i) => <circle key={"d" + i} cx={p[0]} cy={p[1]} r={4} fill="#2f6fe0" stroke="#fff" strokeWidth={1.5} />)}
+      {/* ป้ายภพ + เลข รอบวง */}
+      {N.map((n, i) => { const [lx, ly] = polar(cx, cy, R + 30, i * 30), c = realmHex(n.value); return <g key={"l" + i}>
+        <text x={lx} y={ly - 4} fill="#26324d" fontSize={18} fontWeight="bold" textAnchor="middle" fontFamily={TF}>{i + 1}.{n.name}</text>
+        <text x={lx} y={ly + 15} fill={c} fontSize={16} fontWeight="bold" textAnchor="middle" fontFamily={TF}>เลข {toThaiNum(n.value)}</text>
+      </g>; })}
+      {/* คำอธิบายสี */}
+      <rect x={cx - 156} y={h - 122} width={16} height={16} rx={3} fill="#2f6fe0" /><text x={cx - 134} y={h - 109} fill="#26324d" fontSize={14} fontFamily={TF}>เลขดวงของคุณ</text>
+      <line x1={cx + 22} y1={h - 114} x2={cx + 52} y2={h - 114} stroke="#e8933a" strokeWidth={3} /><text x={cx + 58} y={h - 109} fill="#26324d" fontSize={14} fontFamily={TF}>เต็ม ๑๒ (สูงสุด)</text>
+      {/* สรุปภูมิ */}
+      {([["สวรรค์", heaven, "#37d67a"], ["มนุษย์", human, "#e0a31f"], ["นรก", hell, "#e23b3b"]] as const).map(([t, cnt, col], i) => { const pw = 160, px = cx - (pw * 3 + 20) / 2 + i * (pw + 10), py = h - 82; return <g key={t}><rect x={px} y={py} width={pw} height={40} rx={20} fill={col + "1a"} stroke={col + "66"} /><text x={px + pw / 2} y={py + 26} fill={col} fontSize={15} fontWeight="bold" textAnchor="middle" fontFamily={TF}>{t} {toThaiNum(cnt)} ภพ</text></g>; })}
+    </>;
   }
 
   return (
@@ -903,14 +991,100 @@ function ShareCard({ data, variant }: { data: ApiResponse; variant: keyof typeof
       <div style={{ overflowX: "auto" }}>
         <svg ref={ref} width={w} height={h} viewBox={`0 0 ${w} ${h}`} xmlns="http://www.w3.org/2000/svg" style={{ display: "block", width: "100%", height: "auto", borderRadius: 16 }}>{body}</svg>
       </div>
-      <button onClick={() => downloadSvg(ref.current, w, h, `ดวง-${variant}-${data.name || "ดวง"}.png`)} style={{ marginTop: 8, width: "100%", background: "#2563eb", color: "#fff", border: "none", borderRadius: 8, padding: "8px", cursor: "pointer", fontSize: 15, fontWeight: 700 }}>📥 บันทึก PNG</button>
+      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+        <button onClick={() => shareSvg(ref.current, w, h, `ดวง-${variant}-${data.name || "ดวง"}.png`)} style={{ flex: 1, background: "#37a34a", color: "#fff", border: "none", borderRadius: 8, padding: "8px", cursor: "pointer", fontSize: 15, fontWeight: 700 }}>📤 แชร์</button>
+        <button onClick={() => downloadSvg(ref.current, w, h, `ดวง-${variant}-${data.name || "ดวง"}.png`)} style={{ flex: 1, background: "#2563eb", color: "#fff", border: "none", borderRadius: 8, padding: "8px", cursor: "pointer", fontSize: 15, fontWeight: 700 }}>📥 บันทึก PNG</button>
+      </div>
     </div>
   );
 }
 function ShareCards({ data }: { data: ApiResponse }) {
   return (
     <div style={{ maxWidth: 540, margin: "0 auto" }}>
-      <ShareCard data={data} variant="wheel" />
+      <ShareCard data={data} variant="radar" />
+    </div>
+  );
+}
+/* ---------- 8. คำทำนายรายเดือน (อ้างอิงคอลัมน์ในตารางกราฟ) ---------- */
+function MonthlyForecast({ data }: { data: ApiResponse }) {
+  const natal = data.natal;
+  const birthMon = Number(data.birth.solarDate.slice(5, 7));
+  const [view, setView] = useState<"list" | "snake">("snake");
+  const items = THAI_MONTHS_FULL.map((mn, k) => {
+    const col = (((k + 1) - birthMon) % 12 + 12) % 12; // เดือน k+1 อยู่คอลัมน์ไหน (คอลัมน์ 0 = เดือนเกิด)
+    const house = natal[col];
+    const v = house?.value ?? 0;
+    const c = v >= 9 ? "#2f9e57" : v >= 5 ? "#b07d12" : "#d63a3a"; // สีเข้มอ่านชัด
+    return { mn, k, house, v, c, pct: Math.floor((v / 12) * 100) };
+  });
+  return (
+    <div style={{ marginTop: 4 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+        {([["snake", "🗺️ กราฟทำนาย ๑๒ เดือน"], ["list", "📜 คำทำนาย"]] as const).map(([k, lbl]) => {
+          const on = k === view;
+          return <button key={k} onClick={() => setView(k)} style={{ padding: "5px 14px", borderRadius: 14, fontSize: 13, fontWeight: 700, cursor: "pointer", border: on ? "1px solid #2f6fe0" : "1px solid #d5dcea", background: on ? "#e7efff" : "#ffffff", color: on ? "#2f6fe0" : "#6b7794" }}>{lbl}</button>;
+        })}
+      </div>
+      {view === "list"
+        ? items.map(({ mn, k, house, v, c, pct }) => {
+          const cl = realmHex(v), info = house ? HOUSE_MONTHLY[house.name] : undefined;
+          const tier: "high" | "mid" | "low" = v >= 9 ? "high" : v >= 5 ? "mid" : "low";
+          return (
+            <div key={k} style={{ display: "flex", gap: 14, alignItems: "stretch" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 52, flex: "0 0 52px" }}>
+                <div style={{ boxSizing: "border-box", width: 44, height: 44, minWidth: 44, minHeight: 44, borderRadius: "50%", border: `2.5px solid ${c}`, background: c + "18", color: c, fontWeight: 700, fontSize: 13.5, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontFamily: TF, lineHeight: 1 }}>{toThaiNum(pct)}%</div>
+                {k !== 11 && <div style={{ width: 2, flex: 1, background: "#e2e7f0", minHeight: 14 }} />}
+              </div>
+              <div style={{ flex: 1, paddingBottom: 20 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ fontWeight: 700, color: c, fontSize: 16, flexShrink: 0 }}>{mn} · ภพ{house?.name ?? ""} (เลข {toThaiNum(v)} · {toThaiNum(pct)}% · {realmShort(v)})</div>
+                  <div style={{ flex: 1, height: 0, borderTop: `2px dotted ${cl}`, opacity: 0.7, minWidth: 20 }} />
+                  <div style={{ width: 11, height: 11, borderRadius: "50%", background: cl, flexShrink: 0 }} />
+                </div>
+                {info && <div style={{ fontSize: 13, color: "#8a95ad", margin: "3px 0 5px" }}>🔎 ดูเรื่อง: {info.aspect}</div>}
+                <div style={{ fontSize: 14.5, lineHeight: 1.75 }}>{info ? info[tier].text : realmText(v)}</div>
+                {info && <div style={{ fontSize: 13.5, marginTop: 7, padding: "7px 10px", background: c + "14", borderRadius: 8, color: "#3a4a63" }}>💡 {info[tier].tip}</div>}
+              </div>
+            </div>
+          );
+        })
+        : <MonthlySnake items={items} />}
+    </div>
+  );
+}
+/* งูเลื้อย 12 เดือน */
+function MonthlySnake({ items }: { items: { mn: string; k: number; house?: Natal; v: number; c: string; pct: number }[] }) {
+  const W = 1000, perRow = 4, rows = 3, padX = 84, padTop = 48, rowH = 172;
+  const H = padTop + rows * rowH + 26;
+  const colW = (W - 2 * padX) / perRow;
+  const xCol = (c: number) => padX + (c + 0.5) * colW, rowY = (r: number) => padTop + r * rowH + rowH / 2;
+  const R = rowH / 2, xL = xCol(0), xR = xCol(perRow - 1), sx = 34, ex = W - 34;
+  const d = `M ${sx} ${rowY(0)} L ${xR} ${rowY(0)} A ${R} ${R} 0 0 1 ${xR} ${rowY(1)} L ${xL} ${rowY(1)} A ${R} ${R} 0 0 0 ${xL} ${rowY(2)} L ${ex} ${rowY(2)}`;
+  const nodes = items.map((it, k) => { const row = Math.floor(k / perRow), pos = k % perRow, col = row % 2 === 0 ? pos : perRow - 1 - pos; return { ...it, x: xCol(col), y: rowY(row) }; });
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: "block", background: "#ffffff", borderRadius: 10, maxWidth: "100%" }}>
+        <defs>
+          <linearGradient id="msnake" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#f0a81f" /><stop offset="33%" stopColor="#ff6b9d" /><stop offset="66%" stopColor="#39b6e6" /><stop offset="100%" stopColor="#9a63e0" />
+          </linearGradient>
+        </defs>
+        <path d={d} fill="none" stroke="url(#msnake)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
+        {nodes.map(({ mn, k, house, v, c, pct, x: nx, y: ny }) => {
+          const s = k % 2 === 0 ? -1 : 1, ts = -s, by = ny + s * 50;
+          return (
+            <g key={k}>
+              <line x1={nx} y1={ny + s * 9} x2={nx} y2={ny + s * 34} stroke={c} strokeWidth={1.5} strokeDasharray="2 3" opacity={0.85} />
+              <circle cx={nx} cy={by} r={20} fill="#ffffff" stroke={c} strokeWidth={2.5} />
+              <text x={nx} y={by + 5} fill={c} fontSize={13} fontWeight={700} textAnchor="middle" fontFamily={TF}>{toThaiNum(pct)}%</text>
+              <circle cx={nx} cy={ny} r={5} fill={c} stroke="#ffffff" strokeWidth={1.5} />
+              <text x={nx} y={ny + ts * 17} fill={c} fontSize={17} fontWeight={700} textAnchor="middle" fontFamily={TF}>{mn}</text>
+              <text x={nx} y={ny + ts * 35} fill="#26324d" fontSize={14.5} fontWeight={700} textAnchor="middle" fontFamily={TF}>ภพ{house?.name ?? ""}</text>
+              <text x={nx} y={ny + ts * 52} fill="#5a6b8a" fontSize={12.5} textAnchor="middle" fontFamily={TF}>เลข {toThaiNum(v)} · {toThaiNum(pct)}% · {realmShort(v)}</text>
+            </g>
+          );
+        })}
+      </svg>
     </div>
   );
 }
